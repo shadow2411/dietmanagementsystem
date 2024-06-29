@@ -67,6 +67,6 @@ model Diet {
   calorie       Int?
   allergies     String?
   health_goals  String
-
-  user     User      @relation(fields: [id], references: [id], onDelete: Cascade)
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

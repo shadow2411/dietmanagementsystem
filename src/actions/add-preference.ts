@@ -4,6 +4,7 @@ import { z } from "zod";
 import type { Diet } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
+import {auth} from "@/auth";
 
 const addPreferenceSchema = z.object({
   age: z.number().max(120),
@@ -47,9 +48,7 @@ export async function addPreference(
     goal: formData.get("healthGoals") as string,
     allergies: formData.get("allergies") as string,
   });
-  console.log(result);
   if (!result.success) {
-    console.log(result.error.flatten().fieldErrors);
     return {
       errors: result.error.flatten().fieldErrors,
     };
@@ -65,7 +64,19 @@ export async function addPreference(
       goal,
       allergies,
     } = result.data;
-    let diet: Diet;
+    
+
+    const session = await auth();
+
+    if (!session || !session.user) {
+        return {
+          errors: {
+            _form: ["You must be signed in to create a topic"],
+          },
+        };
+      }
+
+      let diet: Diet;
 
     try {
       diet = await db.diet.create({
@@ -79,19 +90,17 @@ export async function addPreference(
           calorie,
           allergies,
           health_goals: goal,
+          userId: session?.user?.id,
         },
       });
-      console.log("Data Saving Successful");
     } catch (error) {
       if (error instanceof Error) {
-        console.log(error.message);
         return {
           errors: {
             _form: [error.message],
           },
         };
       } else {
-        console.log("Something went wrong");
         return {
           errors: {
             _form: ["Something went wrong"],

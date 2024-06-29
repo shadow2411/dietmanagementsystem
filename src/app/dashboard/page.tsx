@@ -30,13 +30,6 @@ export default async function Dashboard() {
               </h1>
             </div>
           </div>
-
-          <Divider />
-          <div>
-            <h1 className="font-extralight text-2xl  bg-center text-center hover:transition-transform-opacity hover:scale-105">
-              Your Preferences
-            </h1>
-          </div>
         </div>
       </>
     );
